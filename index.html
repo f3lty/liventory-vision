@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Liventory — AI Agent Operating System for Nurseries</title>
+<meta name="description" content="Liventory — an AI agent operating system for nursery and tree-growing businesses. Six agents handling crop intelligence, carbon tracking, grant discovery, and operations. Applying to Hyperagent's Founding 500.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Syne:wght@400;500;600;700;800&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#060e08;--forest:#0c1f12;--moss:#183322;--fern:#2a5c38;
+  --sage:#4a8f5f;--leaf:#6dbf82;--mint:#9ee6b0;--glow:#c2ffcc;
+  --amber:#d4a227;--rust:#b84c2a;--white:#fdfff9;
+  --fd:'Playfair Display',Georgia,serif;
+  --fu:'Syne',sans-serif;
+  --fb:'Crimson Pro',Georgia,serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--white);font-family:var(--fb);font-size:18px;line-height:1.6;overflow-x:hidden;cursor:none}
+.cursor{width:10px;height:10px;background:var(--glow);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:exclusion;transition:width .2s,height .2s}
+.cursor-ring{width:36px;height:36px;border:1px solid rgba(194,255,204,.4);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:left .18s ease,top .18s ease,width .25s,height .25s}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 60px;display:flex;align-items:stretch;justify-content:space-between;backdrop-filter:blur(20px);background:rgba(6,14,8,.92);border-bottom:1px solid rgba(194,255,204,.1);height:64px}
+.nav-logo{text-decoration:none;display:flex;align-items:center;gap:10px;flex-shrink:0} .nav-logo-text{font-family:var(--fu);font-size:15px;font-weight:800;letter-spacing:.12em;color:var(--white);white-space:nowrap}
+.nav-links{display:flex;gap:0;list-style:none;align-items:stretch;margin:0 32px}
+.nav-links li{display:flex;align-items:stretch}
+.nav-links a{font-family:var(--fu);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);text-decoration:none;display:flex;align-items:center;padding:0 20px;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;white-space:nowrap}
+.nav-links a:hover{color:var(--white);border-bottom-color:rgba(194,255,204,.4)}
+.nav-links a.active{color:var(--glow);border-bottom-color:var(--glow)}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-cta{font-family:var(--fu);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--glow);padding:10px 22px;text-decoration:none;transition:opacity .2s;white-space:nowrap;flex-shrink:0}
+.nav-cta:hover{opacity:.85}
+/* hamburger for mobile */
+.nav-burger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;background:none;border:none}
+.nav-burger span{display:block;width:22px;height:2px;background:rgba(255,255,255,.7);transition:all .25s}
+.mobile-menu{display:none;position:fixed;top:64px;left:0;right:0;background:rgba(6,14,8,.97);border-bottom:1px solid rgba(194,255,204,.1);z-index:99;flex-direction:column;padding:16px 0}
+.mobile-menu a{font-family:var(--fu);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.65);text-decoration:none;padding:16px 30px;border-bottom:1px solid rgba(194,255,204,.05);transition:color .2s}
+.mobile-menu a:last-child{border-bottom:none}
+.mobile-menu a:hover,.mobile-menu a.active{color:var(--glow)}
+.mobile-menu.open{display:flex}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:60px;padding:160px 60px 100px;position:relative;overflow:hidden}
+#hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(194,255,204,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(194,255,204,.04) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 0%,transparent 100%);animation:gridpulse 8s ease-in-out infinite}
+#hero::after{content:'';position:absolute;bottom:-20%;left:-10%;width:70%;height:80%;background:radial-gradient(ellipse,rgba(74,143,95,.2) 0%,transparent 65%);pointer-events:none}
+@keyframes gridpulse{0%,100%{opacity:.5}50%{opacity:1}}
+.hero-eyebrow{font-family:var(--fu);font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--leaf);margin-bottom:28px;display:flex;align-items:center;gap:14px;position:relative;z-index:2;opacity:0;animation:fadeup .8s .1s forwards}
+.hero-eyebrow::before{content:'';width:32px;height:1px;background:var(--leaf)}
+.hero-left{display:flex;flex-direction:column;justify-content:center;flex:1;min-width:0;position:relative;z-index:2}
+.hero-h1{font-family:var(--fd);font-size:clamp(42px,5.5vw,96px);font-weight:400;line-height:.95;letter-spacing:-.03em;color:var(--white);max-width:560px;margin-bottom:36px;opacity:0;animation:fadeup .9s .25s forwards}
+.hero-h1 em{color:var(--leaf);font-style:italic;display:block}
+.hero-sub{font-family:var(--fb);font-size:20px;font-weight:300;color:rgba(255,255,255,.55);max-width:480px;line-height:1.7;margin-bottom:48px;opacity:0;animation:fadeup .9s .4s forwards}
+.hero-actions{display:flex;gap:16px;flex-wrap:wrap;opacity:0;animation:fadeup .9s .55s forwards}
+.btn-primary{font-family:var(--fu);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--glow);padding:16px 36px;text-decoration:none;display:inline-block;transition:transform .15s,box-shadow .15s}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(194,255,204,.25)}
+.btn-secondary{font-family:var(--fu);font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.15);padding:16px 36px;text-decoration:none;display:inline-block;transition:color .2s,border-color .2s}
+.btn-secondary:hover{color:var(--glow);border-color:rgba(194,255,204,.4)}
+
+/* HERO ILLUSTRATION — conceptual, clearly labeled */
+.hero-mockup{flex-shrink:0;width:320px;z-index:2;opacity:0;animation:fadeup 1s .7s forwards}
+.mockup-label{font-family:var(--fu);font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:12px;text-align:center}
+.mockup-card{background:rgba(12,31,18,.95);border:1px solid rgba(109,191,130,.15);padding:0;overflow:hidden;backdrop-filter:blur(12px)}
+.mockup-header{background:rgba(24,51,34,.8);padding:12px 18px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(194,255,204,.06)}
+.mockup-dot{width:6px;height:6px;border-radius:50%}
+.mockup-title{font-family:var(--fu);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-left:4px}
+.mockup-body{padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.mockup-row{display:flex;align-items:flex-start;gap:10px}
+.mockup-icon{font-size:14px;flex-shrink:0;margin-top:1px;line-height:1}
+.mockup-content{}
+.mockup-agent{font-family:var(--fu);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--leaf);margin-bottom:2px}
+.mockup-row:nth-child(2) .mockup-agent{color:var(--amber)}
+.mockup-row:nth-child(3) .mockup-agent{color:var(--mint)}
+.mockup-row:nth-child(4) .mockup-agent{color:#e07050}
+.mockup-msg{font-family:var(--fb);font-size:12px;color:rgba(255,255,255,.55);line-height:1.45}
+.mockup-divider{height:1px;background:rgba(194,255,204,.05);margin:2px 0}
+.mockup-footer{padding:10px 18px;border-top:1px solid rgba(194,255,204,.06);font-family:var(--fu);font-size:8px;letter-spacing:.1em;color:rgba(255,255,255,.2);text-transform:uppercase;font-style:italic}
+
+/* TICKER */
+.ticker-wrap{overflow:hidden;background:var(--moss);border-top:1px solid rgba(194,255,204,.07);border-bottom:1px solid rgba(194,255,204,.07);padding:14px 0}
+.ticker{display:flex;animation:ticker 28s linear infinite;white-space:nowrap}
+.ticker-item{font-family:var(--fu);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:0 48px;display:flex;align-items:center;gap:16px}
+.ticker-item::before{content:'*';color:var(--leaf);font-size:14px}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* FOUNDING 500 BANNER */
+.founding-banner{background:rgba(12,31,18,.97);border-top:1px solid rgba(212,162,39,.18);border-bottom:1px solid rgba(212,162,39,.18);padding:18px 60px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.founding-left{display:flex;align-items:center;gap:18px}
+.founding-badge{font-family:var(--fu);font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--ink);background:var(--amber);padding:5px 12px;white-space:nowrap;flex-shrink:0}
+.founding-text{font-family:var(--fb);font-size:15px;color:rgba(255,255,255,.65);line-height:1.45}
+.founding-text strong{color:var(--amber);font-weight:400}
+.founding-deadline{font-family:var(--fu);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(212,162,39,.6);white-space:nowrap}
+@media(max-width:800px){.founding-banner{padding:16px 24px;flex-direction:column;align-items:flex-start;gap:12px}}
+
+/* PROBLEM */
+#problem{background:var(--forest);border-top:1px solid rgba(194,255,204,.06);border-bottom:1px solid rgba(194,255,204,.06)}
+.stats-strip{display:grid;grid-template-columns:repeat(3,1fr)}
+.stat-cell{padding:60px 48px;border-right:1px solid rgba(194,255,204,.08);position:relative;overflow:hidden;transition:background .3s}
+.stat-cell:last-child{border-right:none}
+.stat-cell:hover{background:rgba(42,92,56,.3)}
+.stat-cell::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--leaf),transparent);transform:scaleX(0);transform-origin:left;transition:transform .4s}
+.stat-cell:hover::before{transform:scaleX(1)}
+.stat-big{font-family:var(--fd);font-size:clamp(52px,5vw,80px);font-weight:700;color:var(--glow);line-height:1;margin-bottom:12px;font-style:italic}
+.stat-label{font-family:var(--fu);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:16px}
+.stat-detail{font-size:15px;color:rgba(255,255,255,.45);line-height:1.65}
+
+/* SHARED */
+section{position:relative;z-index:2}
+.section-wrap{max-width:1200px;margin:0 auto;padding:120px 60px}
+.eyebrow{font-family:var(--fu);font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--leaf);margin-bottom:20px;display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:'';width:28px;height:1px;background:var(--leaf)}
+.section-h2{font-family:var(--fd);font-size:clamp(36px,4.5vw,64px);font-weight:400;line-height:1.05;letter-spacing:-.025em;color:var(--white);margin-bottom:20px}
+.section-h2 em{color:var(--leaf);font-style:italic}
+.section-lead{font-size:18px;font-weight:300;color:rgba(255,255,255,.5);max-width:580px;line-height:1.75;margin-bottom:64px}
+
+/* AGENTS */
+#agents{background:var(--ink)}
+.agents-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(194,255,204,.06);border:1px solid rgba(194,255,204,.06)}
+.agent-card{background:var(--ink);padding:44px 36px;position:relative;overflow:hidden;transition:background .3s}
+.agent-card:hover{background:var(--forest)}
+.agent-top-bar{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--leaf),transparent);opacity:0;transition:opacity .3s}
+.agent-card:hover .agent-top-bar{opacity:1}
+.a-amber .agent-top-bar{background:linear-gradient(90deg,var(--amber),transparent)}
+.a-rust .agent-top-bar{background:linear-gradient(90deg,#e07050,transparent)}
+.a-mint .agent-top-bar{background:linear-gradient(90deg,var(--mint),transparent)}
+.a-glow .agent-top-bar{background:linear-gradient(90deg,var(--glow),transparent)}
+.a-sage .agent-top-bar{background:linear-gradient(90deg,var(--sage),transparent)}
+.card-num{font-family:var(--fd);font-size:80px;font-weight:700;font-style:italic;color:rgba(109,191,130,.07);position:absolute;top:16px;right:24px;line-height:1;pointer-events:none;transition:color .3s;user-select:none}
+.agent-card:hover .card-num{color:rgba(109,191,130,.13)}
+.agent-icon-wrap{font-size:28px;margin-bottom:20px;display:block;line-height:1}
+.agent-tag{font-family:var(--fu);font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--leaf);margin-bottom:10px}
+.a-amber .agent-tag{color:var(--amber)}
+.a-rust .agent-tag{color:#e07050}
+.a-mint .agent-tag{color:var(--mint)}
+.a-glow .agent-tag{color:var(--glow)}
+.a-sage .agent-tag{color:var(--sage)}
+.agent-name{font-family:var(--fd);font-size:24px;font-weight:400;color:var(--white);margin-bottom:14px;line-height:1.2}
+.agent-desc{font-size:15px;color:rgba(255,255,255,.45);line-height:1.7;margin-bottom:24px}
+.agent-acts{display:flex;flex-direction:column;gap:8px}
+.act{font-family:var(--fu);font-size:11px;color:rgba(255,255,255,.3);letter-spacing:.04em;padding-left:18px;position:relative;line-height:1.5}
+.act::before{content:'->  ';position:absolute;left:0;color:var(--sage);font-style:normal;letter-spacing:0}
+.a-amber .act::before{color:var(--amber)}
+.a-rust .act::before{color:#e07050}
+.a-mint .act::before{color:var(--mint)}
+.a-glow .act::before{color:var(--glow)}
+.a-sage .act::before{color:var(--sage)}
+
+/* CARBON */
+#carbon{background:var(--forest);border-top:1px solid rgba(194,255,204,.06);border-bottom:1px solid rgba(194,255,204,.06)}
+.carbon-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;max-width:1200px;margin:0 auto;padding:120px 60px}
+.carbon-visual{position:relative;display:flex;align-items:center;justify-content:center;min-height:400px}
+.carbon-ring{width:320px;height:320px;border-radius:50%;border:1px solid rgba(109,191,130,.2);position:absolute;animation:spin 20s linear infinite;display:flex;align-items:center;justify-content:center}
+.carbon-ring::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--leaf);position:absolute;top:-4px;left:50%;transform:translateX(-50%);box-shadow:0 0 20px var(--leaf)}
+.carbon-ring-2{width:220px;height:220px;border:1px solid rgba(109,191,130,.12);animation:spin 14s linear infinite reverse}
+.carbon-ring-2::before{background:var(--mint);box-shadow:0 0 16px var(--mint)}
+.carbon-ring-3{width:130px;height:130px;border:1px solid rgba(109,191,130,.08);animation:spin 8s linear infinite}
+.carbon-ring-3::before{display:none}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.carbon-center{position:absolute;text-align:center;z-index:2}
+.carbon-co2{font-family:var(--fd);font-size:42px;font-weight:700;font-style:italic;color:var(--glow);display:block;line-height:1;margin-bottom:6px}
+.carbon-sub-label{font-family:var(--fu);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.carbon-points{display:flex;flex-direction:column;gap:20px;margin-top:36px}
+.carbon-point{display:flex;gap:20px;align-items:flex-start;padding:22px 24px;background:rgba(6,14,8,.5);border:1px solid rgba(194,255,204,.06);transition:border-color .25s}
+.carbon-point:hover{border-color:rgba(194,255,204,.15)}
+.cp-icon{font-size:22px;flex-shrink:0;margin-top:2px;line-height:1}
+.cp-title{font-family:var(--fu);font-size:12px;font-weight:700;color:var(--white);margin-bottom:5px;letter-spacing:.04em}
+.cp-text{font-size:14px;color:rgba(255,255,255,.4);line-height:1.6}
+
+/* KNOWLEDGE */
+#knowledge{background:var(--ink)}
+.knowledge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(194,255,204,.05);border:1px solid rgba(194,255,204,.05);margin-top:64px}
+.know-card{background:var(--ink);padding:36px 28px;transition:background .25s}
+.know-card:hover{background:var(--forest)}
+.know-num{font-family:var(--fd);font-size:48px;font-style:italic;font-weight:700;color:var(--leaf);line-height:1;margin-bottom:12px}
+.know-title{font-family:var(--fu);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--white);margin-bottom:12px}
+.know-text{font-size:14px;color:rgba(255,255,255,.4);line-height:1.65}
+
+/* TIME SAVED */
+#time{background:var(--forest);border-top:1px solid rgba(194,255,204,.06);border-bottom:1px solid rgba(194,255,204,.06)}
+.time-inner{max-width:1000px;margin:0 auto;padding:120px 60px}
+.comparison-table{width:100%;border-collapse:collapse;margin-top:56px}
+.comparison-table th{font-family:var(--fu);font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.3);padding:16px 28px;background:rgba(24,51,34,.8);border:1px solid rgba(194,255,204,.06);text-align:left;white-space:nowrap}
+.comparison-table td{padding:22px 28px;border:1px solid rgba(194,255,204,.06);vertical-align:middle}
+.comparison-table tbody tr{transition:background .2s}
+.comparison-table tbody tr:hover{background:rgba(42,92,56,.15)}
+.td-task{font-family:var(--fb);font-size:16px;color:rgba(255,255,255,.65)}
+.td-manual{font-family:var(--fd);font-size:26px;font-style:italic;font-weight:700;color:rgba(184,76,42,.85);white-space:nowrap}
+.td-agent{font-family:var(--fd);font-size:26px;font-style:italic;font-weight:700;color:var(--glow);white-space:nowrap}
+
+/* FOUNDER */
+#founder{background:var(--ink);border-top:1px solid rgba(194,255,204,.06)}
+.founder-inner{max-width:1200px;margin:0 auto;padding:120px 60px;display:grid;grid-template-columns:1fr 1.4fr;gap:100px;align-items:center}
+.founder-visual{position:relative}
+.founder-avatar{width:100%;aspect-ratio:1;background:var(--forest);border:1px solid rgba(194,255,204,.1);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.founder-avatar::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 70% at 50% 80%,rgba(74,143,95,.25) 0%,transparent 70%)}
+.founder-initials{font-family:var(--fd);font-size:80px;font-weight:700;font-style:italic;color:rgba(109,191,130,.2);position:relative;z-index:1;user-select:none}
+.founder-name-plate{margin-top:16px;padding:16px 20px;background:var(--forest);border:1px solid rgba(194,255,204,.08)}
+.founder-name{font-family:var(--fd);font-size:20px;color:var(--white);margin-bottom:4px}
+.founder-role{font-family:var(--fu);font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--leaf)}
+.founder-pull{font-family:var(--fd);font-size:clamp(26px,3vw,38px);font-weight:400;line-height:1.2;color:var(--white);margin-bottom:32px;font-style:italic}
+.founder-pull span{color:var(--leaf)}
+.founder-body{display:flex;flex-direction:column;gap:20px}
+.founder-para{font-family:var(--fb);font-size:17px;color:rgba(255,255,255,.6);line-height:1.8}
+.founder-para strong{color:rgba(255,255,255,.85);font-weight:400}
+.founder-quote{margin-top:8px;padding:24px 28px;border-left:2px solid var(--leaf);background:rgba(109,191,130,.04)}
+.founder-quote p{font-family:var(--fd);font-size:19px;font-style:italic;color:rgba(255,255,255,.7);line-height:1.6}
+
+/* PILOT */
+#pilot{background:var(--forest);position:relative;overflow:hidden;border-top:1px solid rgba(194,255,204,.06)}
+#pilot::before{content:'';position:absolute;bottom:-30%;right:-10%;width:60%;height:90%;background:radial-gradient(ellipse,rgba(74,143,95,.15) 0%,transparent 65%);pointer-events:none}
+.pilot-inner{max-width:800px;margin:0 auto;padding:120px 60px;position:relative;z-index:2}
+.pilot-cards{display:flex;flex-direction:column;gap:16px;margin-top:8px;margin-bottom:4px}
+.pilot-card{background:rgba(6,14,8,.6);border:1px solid rgba(194,255,204,.08);padding:28px 32px;display:flex;gap:20px;align-items:flex-start;transition:border-color .25s,transform .2s}
+.pilot-card:hover{border-color:rgba(194,255,204,.22);transform:translateX(4px)}
+.pilot-card.featured{border-color:rgba(194,255,204,.18);background:rgba(42,92,56,.2)}
+.pc-icon{font-size:26px;flex-shrink:0;line-height:1;margin-top:2px}
+.pc-title{font-family:var(--fu);font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--white);margin-bottom:6px}
+.pc-badge{font-family:var(--fu);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--leaf);margin-left:8px}
+.pc-text{font-size:14px;color:rgba(255,255,255,.4);line-height:1.6}
+.wanczyk-note{margin-top:20px;padding:20px 24px;background:rgba(6,14,8,.5);border:1px solid rgba(194,255,204,.1);border-left:2px solid var(--leaf)}
+.wanczyk-label{font-family:var(--fu);font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--leaf);margin-bottom:8px}
+.wanczyk-text{font-size:14px;color:rgba(255,255,255,.5);line-height:1.6}
+
+/* FORM */
+.contact-form{display:flex;flex-direction:column;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:7px}
+.form-group label{font-family:var(--fu);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.form-group input,.form-group select,.form-group textarea{background:rgba(6,14,8,.7);border:1px solid rgba(194,255,204,.12);color:var(--white);font-family:var(--fb);font-size:16px;padding:13px 16px;outline:none;transition:border-color .2s;width:100%;-webkit-appearance:none;appearance:none;border-radius:0}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:rgba(194,255,204,.38)}
+.form-group input::placeholder,.form-group textarea::placeholder{color:rgba(255,255,255,.2)}
+.form-group select option{background:#0c1f12}
+.form-group textarea{resize:vertical;min-height:90px}
+.form-submit{font-family:var(--fu);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--glow);border:none;padding:17px 36px;cursor:pointer;width:100%;transition:opacity .2s,transform .15s;margin-top:6px;border-radius:0}
+.form-submit:hover{opacity:.88;transform:translateY(-2px)}
+.form-note{font-size:13px;color:rgba(255,255,255,.25);text-align:center;line-height:1.5;margin-top:4px}
+
+/* FOOTER */
+footer{background:var(--ink);border-top:1px solid rgba(194,255,204,.06);padding:48px 60px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:24px}
+.foot-logo{display:flex;align-items:center;gap:8px;font-family:var(--fu);font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--white)}
+.foot-links{display:flex;gap:32px;list-style:none}
+.foot-links a{font-family:var(--fu);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.3);text-decoration:none;transition:color .2s}
+.foot-links a:hover{color:var(--glow)}
+.foot-copy{font-family:var(--fu);font-size:10px;letter-spacing:.1em;color:rgba(255,255,255,.2);text-transform:uppercase}
+
+/* ANIMATIONS */
+@keyframes fadeup{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-stagger > *{opacity:0;transform:translateY(28px);transition:opacity .6s ease,transform .6s ease}
+.reveal-stagger.visible > *:nth-child(1){opacity:1;transform:none;transition-delay:0s}
+.reveal-stagger.visible > *:nth-child(2){opacity:1;transform:none;transition-delay:.1s}
+.reveal-stagger.visible > *:nth-child(3){opacity:1;transform:none;transition-delay:.2s}
+.reveal-stagger.visible > *:nth-child(4){opacity:1;transform:none;transition-delay:.3s}
+.reveal-stagger.visible > *:nth-child(5){opacity:1;transform:none;transition-delay:.4s}
+.reveal-stagger.visible > *:nth-child(6){opacity:1;transform:none;transition-delay:.5s}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  nav{padding:0 30px}.nav-links{display:none}.nav-burger{display:flex}
+  #hero{padding:140px 30px 80px;flex-direction:column;gap:0}.hero-mockup{display:none}.hero-h1{max-width:100%}
+  .section-wrap,.carbon-inner,.pilot-inner,.time-inner,.founder-inner{padding:80px 30px}
+  .agents-grid{grid-template-columns:1fr}
+  .stats-strip{grid-template-columns:1fr}
+  .stat-cell{border-right:none;border-bottom:1px solid rgba(194,255,204,.08)}
+  .carbon-inner,.founder-inner,.pilot-inner{grid-template-columns:1fr}
+  .carbon-visual{min-height:280px}
+  .knowledge-grid{grid-template-columns:1fr 1fr}
+  footer{flex-direction:column;text-align:center;padding:40px 30px}
+  .foot-links{flex-wrap:wrap;justify-content:center}
+}
+@media(max-width:600px){
+  body{cursor:auto}.cursor,.cursor-ring{display:none}
+  .knowledge-grid{grid-template-columns:1fr}
+  .hero-h1{font-size:44px}
+  .comparison-table th,.comparison-table td{padding:14px 16px}
+  .td-manual,.td-agent{font-size:20px}
+}
+
+/* DIGITAL TWINS */
+#twins{background:var(--ink);border-top:1px solid rgba(194,255,204,.06)}
+.twins-inner{max-width:1200px;margin:0 auto;padding:120px 60px}
+.twins-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:100px;align-items:center;margin-bottom:100px}
+.twins-visual{position:relative;display:flex;align-items:center;justify-content:center;min-height:440px;min-width:0}
+.twin-passport-wrap{width:100%;max-width:440px;min-width:0}
+.tp-label{font-family:var(--fu);font-size:8px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:12px;text-align:center}
+.twin-passport{background:rgba(12,31,18,.95);border:1px solid rgba(109,191,130,.2);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.5),0 0 0 1px rgba(109,191,130,.06),inset 0 1px 0 rgba(194,255,204,.06)}
+.tp-header{display:flex;justify-content:space-between;align-items:flex-start;padding:22px 24px 18px;border-bottom:1px solid rgba(194,255,204,.07);background:rgba(24,51,34,.5)}
+.tp-species{font-family:var(--fd);font-size:22px;font-style:italic;color:var(--white);line-height:1;margin-bottom:5px}
+.tp-common{font-family:var(--fu);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35)}
+.tp-id-block{text-align:right}
+.tp-id-label{font-family:var(--fu);font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(109,191,130,.5);margin-bottom:4px}
+.tp-id-val{font-family:var(--fu);font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--leaf)}
+.tp-mid{display:flex;gap:20px;padding:20px 24px;border-bottom:1px solid rgba(194,255,204,.07);align-items:center}
+.tp-qr{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0;background:rgba(6,14,8,.6);padding:12px;border:1px solid rgba(109,191,130,.12)}
+.tp-qr-label{font-family:var(--fu);font-size:7px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.25)}
+.tp-vitals{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1}
+.tp-vital{background:rgba(6,14,8,.5);border:1px solid rgba(194,255,204,.06);padding:10px 14px}
+.tp-vital-label{font-family:var(--fu);font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:5px}
+.tp-vital-val{font-family:var(--fu);font-size:13px;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:.04em}
+.tp-val-leaf{color:var(--leaf)}
+.tp-val-amber{color:var(--amber)}
+.tp-streams{padding:0}
+.tp-stream-row{display:flex;align-items:center;gap:8px;padding:10px 24px;border-bottom:1px solid rgba(194,255,204,.05);transition:background .2s;min-width:0}
+.tp-stream-row:hover{background:rgba(42,92,56,.15)}
+.tp-stream-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.tp-dot-amber{background:var(--amber);box-shadow:0 0 8px rgba(212,162,39,.5)}
+.tp-dot-leaf{background:var(--leaf);box-shadow:0 0 8px rgba(109,191,130,.5)}
+.tp-dot-mint{background:var(--mint);box-shadow:0 0 8px rgba(158,230,176,.4)}
+.tp-dot-rust{background:#e07050;box-shadow:0 0 8px rgba(224,112,80,.4)}
+.tp-stream-key{font-family:var(--fu);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);white-space:nowrap;flex-shrink:0;width:130px;overflow:hidden;text-overflow:ellipsis}
+.tp-stream-val{font-family:var(--fb);font-size:12px;color:rgba(255,255,255,.55);flex:1;line-height:1.3;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tp-stream-live{font-family:var(--fu);font-size:8px;font-weight:700;letter-spacing:.14em;color:var(--leaf);background:rgba(109,191,130,.08);border:1px solid rgba(109,191,130,.18);padding:3px 7px;flex-shrink:0}
+.tp-live-amber{color:var(--amber);background:rgba(212,162,39,.08);border-color:rgba(212,162,39,.2)}
+.tp-footer{display:flex;background:rgba(6,14,8,.6);border-top:1px solid rgba(194,255,204,.07)}
+.tp-foot-item{flex:1;padding:14px 20px;border-right:1px solid rgba(194,255,204,.06)}
+.tp-foot-item:last-child{border-right:none}
+.tp-foot-label{font-family:var(--fu);font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.22);margin-bottom:5px}
+.tp-foot-val{font-family:var(--fu);font-size:11px;font-weight:700;letter-spacing:.04em;color:rgba(255,255,255,.55)}
+.tp-shadow-label{font-family:var(--fu);font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.15);text-align:center;margin-top:14px}
+.twins-content .section-lead{margin-bottom:40px}
+.twin-lifecycle{display:flex;flex-direction:column;gap:0;margin-top:40px;position:relative}
+.twin-lifecycle::before{content:'';position:absolute;left:19px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--leaf),rgba(109,191,130,.1))}
+.twin-step{display:flex;gap:24px;align-items:flex-start;padding:20px 0}
+.twin-step-num{width:38px;height:38px;border-radius:50%;background:var(--forest);border:1px solid rgba(109,191,130,.25);display:flex;align-items:center;justify-content:center;font-family:var(--fu);font-size:10px;font-weight:700;color:var(--leaf);flex-shrink:0;position:relative;z-index:1}
+.twin-step-body{}
+.twin-step-title{font-family:var(--fu);font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--white);margin-bottom:5px}
+.twin-step-text{font-size:14px;color:rgba(255,255,255,.4);line-height:1.65}
+.twins-capabilities{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(194,255,204,.06);border:1px solid rgba(194,255,204,.06);margin-top:80px}
+.twin-cap{background:var(--ink);padding:40px 32px;transition:background .3s;position:relative;overflow:hidden}
+.twin-cap:hover{background:var(--forest)}
+.twin-cap-bar{position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .3s}
+.twin-cap:hover .twin-cap-bar{opacity:1}
+.twin-cap-icon{font-size:30px;margin-bottom:20px;display:block;line-height:1}
+.twin-cap-title{font-family:var(--fu);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--white);margin-bottom:12px}
+.twin-cap-text{font-size:14px;color:rgba(255,255,255,.4);line-height:1.7}
+.twin-cap-tag{display:inline-block;margin-top:16px;font-family:var(--fu);font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:5px 12px;background:rgba(109,191,130,.08);border:1px solid rgba(109,191,130,.15);color:var(--leaf)}
+.twins-horizon{margin-top:80px;padding:48px 56px;background:rgba(12,31,18,.8);border:1px solid rgba(194,255,204,.1);border-left:2px solid var(--leaf);display:grid;grid-template-columns:1fr 2fr;gap:60px;align-items:center}
+.twins-horizon-label{font-family:var(--fu);font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--leaf);margin-bottom:12px}
+.twins-horizon-h{font-family:var(--fd);font-size:28px;font-style:italic;color:var(--white);line-height:1.2}
+.twins-horizon-text{font-size:15px;color:rgba(255,255,255,.45);line-height:1.75}
+@media(max-width:1024px){
+  .twins-hero{grid-template-columns:1fr;gap:60px}
+  .twin-passport-wrap{max-width:100%}
+  .tp-stream-key{width:100px}
+  .twins-capabilities{grid-template-columns:1fr}
+  .twins-horizon{grid-template-columns:1fr;gap:24px;padding:36px 30px}
+  .twins-inner{padding:80px 30px}
+}
+
+/* SCREENSHOTS */
+#preview{background:var(--forest);border-top:1px solid rgba(194,255,204,.06);border-bottom:1px solid rgba(194,255,204,.06)}
+.pdf-pages{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px}
+.pdf-page-card{background:var(--ink);border:1px solid rgba(194,255,204,.1);overflow:hidden;transition:border-color .25s,transform .2s}
+.pdf-page-card:hover{border-color:rgba(194,255,204,.25);transform:translateY(-3px)}
+.screen-label{font-family:var(--fu);font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:12px 16px;border-bottom:1px solid rgba(194,255,204,.07);background:rgba(24,51,34,.6)}
+.pdf-page-img{width:100%;display:block;opacity:.92;transition:opacity .25s}
+.pdf-page-card:hover .pdf-page-img{opacity:1}
+.screen-note{font-family:var(--fu);font-size:11px;font-weight:600;letter-spacing:.08em;color:rgba(255,255,255,.3);text-align:center;padding:20px;border:1px solid rgba(194,255,204,.06);background:rgba(6,14,8,.4)}
+@media(max-width:800px){.pdf-pages{grid-template-columns:1fr}}
+
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">
+    <img src="data:image/jpeg;base64,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" alt="Liventory" width="36" height="36" style="border-radius:8px;display:block;flex-shrink:0">
+    <span class="nav-logo-text">LIVENTORY</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#agents" data-section="agents">Agents</a></li>
+    <li><a href="#twins" data-section="twins">Twins</a></li>
+    <li><a href="#carbon" data-section="carbon">Carbon</a></li>
+    <li><a href="#knowledge" data-section="knowledge">Intelligence</a></li>
+    
+    <li><a href="#pilot" data-section="pilot">Early Access</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-burger" id="burger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#agents">Agents</a>
+  <a href="#twins">Twins</a>
+  <a href="#carbon">Carbon</a>
+  <a href="#knowledge">Intelligence</a>
+  <a href="#pilot" style="color:var(--glow)">Early Access</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">Vision · AI Agent Operating System for Nurseries</div>
+    <h1 class="hero-h1">
+      What if nurseries had<br>a brain that <em>never<br>stopped working.</em>
+    </h1>
+    <p class="hero-sub">
+      Six autonomous AI agents designed for growers — monitoring crops, tracking carbon, finding grants, and running the business side. All from one platform. This is what that future looks like.
+    </p>
+    <div class="hero-actions">
+      <a href="#agents" class="btn-primary">See the Vision</a>
+    </div>
+  </div>
+
+  <!-- Conceptual mockup — clearly a design illustration -->
+  <div class="hero-mockup">
+    <div class="mockup-label">Concept — Agent Activity Feed</div>
+    <div class="mockup-card">
+      <div class="mockup-header">
+        <div class="mockup-dot" style="background:#e07050"></div>
+        <div class="mockup-dot" style="background:var(--amber);margin-left:4px"></div>
+        <div class="mockup-dot" style="background:var(--leaf);margin-left:4px"></div>
+        <div class="mockup-title">Liventory Agent Feed</div>
+      </div>
+      <div class="mockup-body">
+        <div class="mockup-row">
+          <div class="mockup-icon">🌿</div>
+          <div class="mockup-content">
+            <div class="mockup-agent">Crop Agent</div>
+            <div class="mockup-msg">Arborvitae stock aging past 45 days — markdown recommendation ready for review</div>
+          </div>
+        </div>
+        <div class="mockup-divider"></div>
+        <div class="mockup-row">
+          <div class="mockup-icon">🔍</div>
+          <div class="mockup-content">
+            <div class="mockup-agent">Grant Agent</div>
+            <div class="mockup-msg">USDA EQIP program match found — draft application ready, deadline in 18 days</div>
+          </div>
+        </div>
+        <div class="mockup-divider"></div>
+        <div class="mockup-row">
+          <div class="mockup-icon">🌍</div>
+          <div class="mockup-content">
+            <div class="mockup-agent">Carbon Agent</div>
+            <div class="mockup-msg">Season total: 8.2 tCO2e sequestered — qualifying threshold met for CSP program</div>
+          </div>
+        </div>
+        <div class="mockup-divider"></div>
+        <div class="mockup-row">
+          <div class="mockup-icon">💼</div>
+          <div class="mockup-content">
+            <div class="mockup-agent">Ops Agent</div>
+            <div class="mockup-msg">2 invoices overdue — follow-up drafts ready to send</div>
+          </div>
+        </div>
+      </div>
+      <div class="mockup-footer">Illustrative — showing what agents are designed to do</div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap"><div class="ticker">
+  <span class="ticker-item">Crop Intelligence</span>
+  <span class="ticker-item">Carbon Optimization</span>
+  <span class="ticker-item">Grant Discovery</span>
+  <span class="ticker-item">Business Operations</span>
+  <span class="ticker-item">Plant Encyclopedia</span>
+  <span class="ticker-item">Field Agent Mobile</span>
+  <span class="ticker-item">Pest Diagnosis</span>
+  <span class="ticker-item">Payroll Automation</span>
+  <span class="ticker-item">Carbon Credit Registry</span>
+  <span class="ticker-item">Live Weather All Zones</span>
+  <span class="ticker-item">Crop Intelligence</span>
+  <span class="ticker-item">Carbon Optimization</span>
+  <span class="ticker-item">Grant Discovery</span>
+  <span class="ticker-item">Business Operations</span>
+  <span class="ticker-item">Plant Encyclopedia</span>
+  <span class="ticker-item">Field Agent Mobile</span>
+  <span class="ticker-item">Pest Diagnosis</span>
+  <span class="ticker-item">Payroll Automation</span>
+  <span class="ticker-item">Carbon Credit Registry</span>
+  <span class="ticker-item">Live Weather All Zones</span>
+</div></div>
+
+<!-- FOUNDING 500 BANNER -->
+<div class="founding-banner">
+  <div class="founding-left">
+    <div class="founding-badge">Founding 500</div>
+    <div class="founding-text">Liventory is applying to <strong>Hyperagent's Founding 500</strong> — Howie Liu's $10M program backing 500 agent-first founders with $20K in inference credits each. This is exactly the kind of vertical AI infrastructure Liventory is built to be.</div>
+  </div>
+  <div class="founding-deadline">Application deadline: May 31, 2026</div>
+</div>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="stats-strip reveal-stagger">
+    <div class="stat-cell">
+      <div class="stat-big">$14B+</div>
+      <div class="stat-label">U.S. Nursery Market</div>
+      <div class="stat-detail">Growing at 4% annually. Every independent nursery is still running on whiteboards and spreadsheets. No vertical AI platform has touched this market.</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-big">~15K</div>
+      <div class="stat-label">Independent Nurseries</div>
+      <div class="stat-detail">Operations over $100K revenue — the core addressable market. Each one is a candidate to replace 6 to 10 disconnected tools with a single agent operating system.</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-big">4–6h+</div>
+      <div class="stat-label">Given Back Per Grower, Per Week</div>
+      <div class="stat-detail">Most growers didn't get into this business to do paperwork. Inventory checks alone happen multiple times a week — and agents are designed to handle all of it automatically.</div>
+    </div>
+  </div>
+</section>
+
+<!-- AGENTS -->
+<section id="agents">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="eyebrow">The Agent Fleet</div>
+      <h2 class="section-h2">Six agents.<br>One <em>operating system.</em></h2>
+      <p class="section-lead">Six AI agents, each owning a core part of nursery operations. Beneath them all: a digital twin layer that gives every plant a persistent identity, connecting the agents to real, living inventory.</p>
+    </div>
+    <div class="agents-grid reveal-stagger">
+
+      <div class="agent-card">
+        <div class="agent-top-bar"></div>
+        <div class="card-num">01</div>
+        <div class="agent-icon-wrap">🌿</div>
+        <div class="agent-tag">Agent 01</div>
+        <div class="agent-name">Crop Intelligence Agent</div>
+        <div class="agent-desc">Monitors plant inventory and surfaces issues before they become losses — slow-moving stock, pest risks, and care needs flagged by species and growing zone.</div>
+        <div class="agent-acts">
+          <div class="act">Inventory aging analysis across all varieties</div>
+          <div class="act">Markdown recommendations with estimated recovery value</div>
+          <div class="act">Pest risk flags via weather data and CABI database</div>
+          <div class="act">AI care guidance per species, per growing zone</div>
+          <div class="act">Live counts fed by digital twin layer</div>
+        </div>
+      </div>
+
+      <div class="agent-card a-amber">
+        <div class="agent-top-bar"></div>
+        <div class="card-num">02</div>
+        <div class="agent-icon-wrap">🌍</div>
+        <div class="agent-tag">Agent 02</div>
+        <div class="agent-name">Carbon and Sustainability Agent</div>
+        <div class="agent-desc">Tracks emissions from fuel, deliveries, and irrigation automatically — then surfaces grant eligibility and carbon credit opportunities from that same data, no manual entry required.</div>
+        <div class="agent-acts">
+          <div class="act">Emissions tracked from operational data — minimal manual entry</div>
+          <div class="act">Surfaces grants that require documented carbon data</div>
+          <div class="act">Identifies growing practices that reduce emissions</div>
+          <div class="act">Groundwork for carbon credit registry integration</div>
+        </div>
+      </div>
+
+      <div class="agent-card a-rust">
+        <div class="agent-top-bar"></div>
+        <div class="card-num">03</div>
+        <div class="agent-icon-wrap">💼</div>
+        <div class="agent-tag">Agent 03</div>
+        <div class="agent-name">Business Ops Agent</div>
+        <div class="agent-desc">Handles the business side — quotes, invoices, payroll summaries from crew logs, and revenue benchmarking against industry data — so operators can run the numbers without doing them manually.</div>
+        <div class="agent-acts">
+          <div class="act">Quote to invoice to payment tracking</div>
+          <div class="act">Payroll summaries from crew time logs</div>
+          <div class="act">Revenue gap analysis vs. industry benchmarks</div>
+          <div class="act">Capital deployment recommendations</div>
+        </div>
+      </div>
+
+      <div class="agent-card a-mint">
+        <div class="agent-top-bar"></div>
+        <div class="card-num">04</div>
+        <div class="agent-icon-wrap">📚</div>
+        <div class="agent-tag">Agent 04</div>
+        <div class="agent-name">Global Plant Intelligence Agent</div>
+        <div class="agent-desc">Draws on 300,000+ species of plant data to surface expert guidance tuned to your zone, weather, and growing conditions — including photo-based disease diagnosis in the field.</div>
+        <div class="agent-acts">
+          <div class="act">Care guides specific to your zone and current weather</div>
+          <div class="act">Photo-based disease diagnosis via PlantNet AI</div>
+          <div class="act">Propagation schedules with timing recommendations</div>
+          <div class="act">Carbon sequestration rate per species</div>
+        </div>
+      </div>
+
+      <div class="agent-card a-glow">
+        <div class="agent-top-bar"></div>
+        <div class="card-num">05</div>
+        <div class="agent-icon-wrap">🔍</div>
+        <div class="agent-tag">Agent 05</div>
+        <div class="agent-name">Grant Discovery Agent</div>
+        <div class="agent-desc">Scans Grants.gov, USDA NRCS, and state programs continuously — matching open opportunities to your nursery profile and surfacing relevant deadlines before they pass unnoticed.</div>
+        <div class="agent-acts">
+          <div class="act">Scan of federal and state grant databases</div>
+          <div class="act">Profile-matching to your operation type and size</div>
+          <div class="act">Application summaries from your existing platform data</div>
+          <div class="act">Deadline and status tracking</div>
+        </div>
+      </div>
+
+      <div class="agent-card a-sage">
+        <div class="agent-top-bar"></div>
+        <div class="card-num">06</div>
+        <div class="agent-icon-wrap">📱</div>
+        <div class="agent-tag">Agent 06</div>
+        <div class="agent-name">Mobile Field Agent</div>
+        <div class="agent-desc">A field companion for the greenhouse floor — barcode scanning, photo-based plant diagnosis, and care logging that works offline and syncs automatically when you're back in range.</div>
+        <div class="agent-acts">
+          <div class="act">QR tag scanning — updates plant's digital twin record instantly</div>
+          <div class="act">Photo-based disease diagnosis in the field</div>
+          <div class="act">Offline-first design with automatic sync</div>
+          <div class="act">GPS tagging for multi-acre operations</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- DIGITAL TWINS -->
+<section id="twins">
+  <div class="twins-inner">
+
+    <div class="twins-hero">
+      <!-- Visual -->
+      <div class="twins-visual reveal">
+        <div class="twin-passport-wrap">
+          <div class="tp-label">LIVENTORY · DIGITAL TWIN · LIVE RECORD</div>
+          <div class="twin-passport">
+            <!-- Header -->
+            <div class="tp-header">
+              <div class="tp-header-left">
+                <div class="tp-species">Acer rubrum</div>
+                <div class="tp-common">Red Maple · Zone 5b</div>
+              </div>
+              <div class="tp-id-block">
+                <div class="tp-id-label">TWIN ID</div>
+                <div class="tp-id-val">LV-2026-0441</div>
+              </div>
+            </div>
+
+            <!-- QR + status row -->
+            <div class="tp-mid">
+              <div class="tp-qr">
+                <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="60" height="60" fill="none"/>
+                  <!-- QR blocks - simplified but realistic pattern -->
+                  <rect x="2" y="2" width="18" height="18" rx="1" fill="none" stroke="#6dbf82" stroke-width="1.5"/>
+                  <rect x="5" y="5" width="12" height="12" rx="0.5" fill="#6dbf82" opacity=".15"/>
+                  <rect x="7" y="7" width="8" height="8" rx="0.5" fill="#6dbf82"/>
+                  <rect x="40" y="2" width="18" height="18" rx="1" fill="none" stroke="#6dbf82" stroke-width="1.5"/>
+                  <rect x="43" y="5" width="12" height="12" rx="0.5" fill="#6dbf82" opacity=".15"/>
+                  <rect x="45" y="7" width="8" height="8" rx="0.5" fill="#6dbf82"/>
+                  <rect x="2" y="40" width="18" height="18" rx="1" fill="none" stroke="#6dbf82" stroke-width="1.5"/>
+                  <rect x="5" y="43" width="12" height="12" rx="0.5" fill="#6dbf82" opacity=".15"/>
+                  <rect x="7" y="45" width="8" height="8" rx="0.5" fill="#6dbf82"/>
+                  <!-- Data dots -->
+                  <rect x="24" y="2" width="4" height="4" fill="#6dbf82" opacity=".7"/>
+                  <rect x="30" y="2" width="4" height="4" fill="#6dbf82" opacity=".4"/>
+                  <rect x="24" y="8" width="4" height="4" fill="#6dbf82" opacity=".5"/>
+                  <rect x="30" y="8" width="4" height="4" fill="#6dbf82" opacity=".9"/>
+                  <rect x="36" y="8" width="4" height="4" fill="#6dbf82" opacity=".3"/>
+                  <rect x="24" y="14" width="4" height="4" fill="#6dbf82" opacity=".8"/>
+                  <rect x="36" y="14" width="4" height="4" fill="#6dbf82" opacity=".6"/>
+                  <rect x="24" y="24" width="4" height="4" fill="#6dbf82" opacity=".6"/>
+                  <rect x="30" y="24" width="4" height="4" fill="#6dbf82" opacity=".3"/>
+                  <rect x="36" y="24" width="4" height="4" fill="#6dbf82" opacity=".8"/>
+                  <rect x="42" y="24" width="4" height="4" fill="#6dbf82" opacity=".5"/>
+                  <rect x="48" y="24" width="4" height="4" fill="#d4a227" opacity=".7"/>
+                  <rect x="54" y="24" width="4" height="4" fill="#6dbf82" opacity=".4"/>
+                  <rect x="24" y="30" width="4" height="4" fill="#6dbf82" opacity=".9"/>
+                  <rect x="36" y="30" width="4" height="4" fill="#6dbf82" opacity=".4"/>
+                  <rect x="48" y="30" width="4" height="4" fill="#6dbf82" opacity=".7"/>
+                  <rect x="24" y="36" width="4" height="4" fill="#d4a227" opacity=".6"/>
+                  <rect x="30" y="36" width="4" height="4" fill="#6dbf82" opacity=".5"/>
+                  <rect x="42" y="36" width="4" height="4" fill="#6dbf82" opacity=".8"/>
+                  <rect x="54" y="36" width="4" height="4" fill="#6dbf82" opacity=".3"/>
+                  <rect x="24" y="42" width="4" height="4" fill="#6dbf82" opacity=".4"/>
+                  <rect x="36" y="42" width="4" height="4" fill="#6dbf82" opacity=".9"/>
+                  <rect x="48" y="42" width="4" height="4" fill="#6dbf82" opacity=".6"/>
+                  <rect x="24" y="48" width="4" height="4" fill="#6dbf82" opacity=".7"/>
+                  <rect x="30" y="48" width="4" height="4" fill="#d4a227" opacity=".5"/>
+                  <rect x="36" y="48" width="4" height="4" fill="#6dbf82" opacity=".3"/>
+                  <rect x="48" y="48" width="4" height="4" fill="#6dbf82" opacity=".8"/>
+                  <rect x="54" y="48" width="4" height="4" fill="#6dbf82" opacity=".5"/>
+                  <rect x="24" y="54" width="4" height="4" fill="#6dbf82" opacity=".6"/>
+                  <rect x="42" y="54" width="4" height="4" fill="#6dbf82" opacity=".4"/>
+                  <rect x="54" y="54" width="4" height="4" fill="#6dbf82" opacity=".9"/>
+                </svg>
+                <div class="tp-qr-label">Scan to update</div>
+              </div>
+              <div class="tp-vitals">
+                <div class="tp-vital">
+                  <div class="tp-vital-label">Stage</div>
+                  <div class="tp-vital-val tp-val-leaf">Field · Row 4</div>
+                </div>
+                <div class="tp-vital">
+                  <div class="tp-vital-label">Days in field</div>
+                  <div class="tp-vital-val">214</div>
+                </div>
+                <div class="tp-vital">
+                  <div class="tp-vital-label">Status</div>
+                  <div class="tp-vital-val tp-val-leaf">● Healthy</div>
+                </div>
+                <div class="tp-vital">
+                  <div class="tp-vital-label">Est. value</div>
+                  <div class="tp-vital-val tp-val-amber">$38.00</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Data streams -->
+            <div class="tp-streams">
+              <div class="tp-stream-row">
+                <div class="tp-stream-dot tp-dot-amber"></div>
+                <div class="tp-stream-key">Weather · Zone 5b</div>
+                <div class="tp-stream-val">67°F · No frost risk · Wind 8mph</div>
+                <div class="tp-stream-live">LIVE</div>
+              </div>
+              <div class="tp-stream-row">
+                <div class="tp-stream-dot tp-dot-leaf"></div>
+                <div class="tp-stream-key">Carbon sequestered</div>
+                <div class="tp-stream-val">12.4 kg CO₂ · Since propagation</div>
+                <div class="tp-stream-live">AUTO</div>
+              </div>
+              <div class="tp-stream-row">
+                <div class="tp-stream-dot tp-dot-mint"></div>
+                <div class="tp-stream-key">Last scan</div>
+                <div class="tp-stream-val">May 23 · 7:41am · Worker field check</div>
+                <div class="tp-stream-live">LOG</div>
+              </div>
+              <div class="tp-stream-row">
+                <div class="tp-stream-dot tp-dot-rust"></div>
+                <div class="tp-stream-key">Aging alert</div>
+                <div class="tp-stream-val">Approaching peak sell window · 18 days</div>
+                <div class="tp-stream-live tp-live-amber">FLAG</div>
+              </div>
+            </div>
+
+            <!-- Footer bar -->
+            <div class="tp-footer">
+              <div class="tp-foot-item">
+                <div class="tp-foot-label">Origin batch</div>
+                <div class="tp-foot-val">B-2025-014 · 60 units</div>
+              </div>
+              <div class="tp-foot-item">
+                <div class="tp-foot-label">Propagated</div>
+                <div class="tp-foot-val">Oct 22, 2025</div>
+              </div>
+              <div class="tp-foot-item">
+                <div class="tp-foot-label">Twin type</div>
+                <div class="tp-foot-val tp-val-leaf">Individual</div>
+              </div>
+            </div>
+          </div>
+          <div class="tp-shadow-label">Conceptual — every plant, a living record</div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="twins-content reveal">
+        <div class="eyebrow">Digital Twin Layer</div>
+        <h2 class="section-h2">Every plant gets<br>an <em>identity.</em></h2>
+        <p class="section-lead">The connective tissue beneath every agent. From the moment a batch is propagated, Liventory creates a digital twin — a persistent, living record that ties together location, weather exposure, aging status, carbon data, and eventual sale. Not a dashboard. A living system that knows where everything is and what it's worth.</p>
+
+        <div class="twin-lifecycle">
+          <div class="twin-step">
+            <div class="twin-step-num">01</div>
+            <div class="twin-step-body">
+              <div class="twin-step-title">Batch twin created at propagation</div>
+              <div class="twin-step-text">The moment a new batch is started, a digital record is born — species, quantity, propagation date, growing zone. One entry up front. Everything after that is automatic.</div>
+            </div>
+          </div>
+          <div class="twin-step">
+            <div class="twin-step-num">02</div>
+            <div class="twin-step-body">
+              <div class="twin-step-title">Splits to individual records in the field</div>
+              <div class="twin-step-text">As plants move from greenhouse to field rows, each gets its own identity. A QR code on the tag you're already printing is all it takes to update it.</div>
+            </div>
+          </div>
+          <div class="twin-step">
+            <div class="twin-step-num">03</div>
+            <div class="twin-step-body">
+              <div class="twin-step-title">Agents read and write to every twin</div>
+              <div class="twin-step-text">Weather data attaches to the plant's zone. Aging flags trigger automatically. Inventory counts populate in real time. Every agent is connected to the same source of truth.</div>
+            </div>
+          </div>
+          <div class="twin-step">
+            <div class="twin-step-num">04</div>
+            <div class="twin-step-body">
+              <div class="twin-step-title">Twin travels with the tree — through sale</div>
+              <div class="twin-step-text">Traceability, care history, carbon sequestration data — all attached. Opens the door to verified provenance for premium buyers, online sales, and direct-to-customer markets.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Capability cards -->
+    <div class="twins-capabilities reveal-stagger">
+
+      <div class="twin-cap">
+        <div class="twin-cap-bar" style="background:linear-gradient(90deg,var(--leaf),transparent)"></div>
+        <span class="twin-cap-icon">📱</span>
+        <div class="twin-cap-title">QR-Powered Field Updates</div>
+        <div class="twin-cap-text">Workers or customers scan the tag already on the tree. Location updates, care logs, and inventory counts happen instantly — no spreadsheet, no desk, no delay.</div>
+        <div class="twin-cap-tag">Uses tags you already print</div>
+      </div>
+
+      <div class="twin-cap">
+        <div class="twin-cap-bar" style="background:linear-gradient(90deg,var(--amber),transparent)"></div>
+        <span class="twin-cap-icon">🌡️</span>
+        <div class="twin-cap-title">Zone-Aware Intelligence</div>
+        <div class="twin-cap-text">Because each twin knows exactly where a plant lives, weather alerts, frost warnings, and pest risk flags can be matched to individual plants — not just the whole operation.</div>
+        <div class="twin-cap-tag" style="color:var(--amber);border-color:rgba(212,162,39,.2);background:rgba(212,162,39,.06)">Per-plant precision</div>
+      </div>
+
+      <div class="twin-cap">
+        <div class="twin-cap-bar" style="background:linear-gradient(90deg,var(--mint),transparent)"></div>
+        <span class="twin-cap-icon">🌍</span>
+        <div class="twin-cap-title">Carbon Sequestration per Tree</div>
+        <div class="twin-cap-text">Each twin carries species-level carbon data. Aggregate across your inventory and you have verified, documented sequestration numbers — the foundation for carbon credit registry integration.</div>
+        <div class="twin-cap-tag" style="color:var(--mint);border-color:rgba(158,230,176,.2);background:rgba(158,230,176,.06)">Credit-ready data</div>
+      </div>
+
+      <div class="twin-cap">
+        <div class="twin-cap-bar" style="background:linear-gradient(90deg,var(--glow),transparent)"></div>
+        <span class="twin-cap-icon">📦</span>
+        <div class="twin-cap-title">Real-Time Inventory Without Manual Counts</div>
+        <div class="twin-cap-text">As plants are scanned, sold, or moved, counts update automatically. The inventory agents don't have to estimate — they read directly from the twin layer.</div>
+        <div class="twin-cap-tag" style="color:var(--glow);border-color:rgba(194,255,204,.2);background:rgba(194,255,204,.06)">Always accurate</div>
+      </div>
+
+      <div class="twin-cap">
+        <div class="twin-cap-bar" style="background:linear-gradient(90deg,#e07050,transparent)"></div>
+        <span class="twin-cap-icon">🛒</span>
+        <div class="twin-cap-title">Online Sales, Enabled</div>
+        <div class="twin-cap-text">When your inventory has a live, accurate twin layer, selling online becomes possible. Customers see real stock, not estimates. Orders pull from confirmed availability. Returns are traceable.</div>
+        <div class="twin-cap-tag" style="color:#e07050;border-color:rgba(224,112,80,.2);background:rgba(224,112,80,.06)">Direct-to-buyer</div>
+      </div>
+
+      <div class="twin-cap">
+        <div class="twin-cap-bar" style="background:linear-gradient(90deg,var(--sage),transparent)"></div>
+        <span class="twin-cap-icon">🔬</span>
+        <div class="twin-cap-title">Propagation Intelligence</div>
+        <div class="twin-cap-text">Track success rates, timing, and yield across batches. Over time, the system learns which propagation approaches perform best for which species under which conditions.</div>
+        <div class="twin-cap-tag" style="color:var(--sage);border-color:rgba(74,143,95,.2);background:rgba(74,143,95,.06)">In development</div>
+      </div>
+
+    </div>
+
+    <!-- Horizon callout -->
+    <div class="twins-horizon reveal">
+      <div>
+        <div class="twins-horizon-label">The Bigger Picture</div>
+        <div class="twins-horizon-h">A verified tree, sold anywhere in the world.</div>
+      </div>
+      <div class="twins-horizon-text">
+        Done right, a digital twin gives a premium tree something it's never had: a documented identity. Origin nursery, species, growth timeline, care history, carbon data. That's the foundation for selling high-value trees to buyers who care about provenance — landscapers, municipalities, high-end residential — without being tied to local markets. This isn't an NFT play. It's traceability infrastructure for an industry that has never had it.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CARBON -->
+<section id="carbon">  <div class="carbon-inner">
+    <div class="carbon-visual reveal">
+      <div class="carbon-ring">
+        <div class="carbon-ring-2">
+          <div class="carbon-ring-3"></div>
+        </div>
+      </div>
+      <div class="carbon-center">
+        <span class="carbon-co2">CO2</span>
+        <span class="carbon-sub-label">The vision: tracked, quantified, monetized.</span>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="eyebrow">Carbon Intelligence</div>
+      <h2 class="section-h2">More trees.<br><em>Better planet.</em><br>Better business.</h2>
+      <p class="section-lead" style="margin-bottom:0">Every tree a nursery grows is carbon pulled from the atmosphere. Liventory is being built to quantify that — and eventually turn it into grants, credits, and competitive advantage.</p>
+      <div class="carbon-points">
+        <div class="carbon-point">
+          <div class="cp-icon">⚡</div>
+          <div>
+            <div class="cp-title">Tracked from operations</div>
+            <div class="cp-text">The goal is for emissions data to flow from fuel runs, deliveries, irrigation, and plant inventory with minimal manual entry — building a carbon record as a byproduct of running the business.</div>
+          </div>
+        </div>
+        <div class="carbon-point">
+          <div class="cp-icon">💰</div>
+          <div>
+            <div class="cp-title">Grant eligibility surfaced</div>
+            <div class="cp-text">USDA EQIP, CSP, and RCPP programs require documented emissions data. Liventory is designed to generate this as a byproduct of normal operations — making $10K–$50K in annual grants potentially accessible to qualifying nurseries.</div>
+          </div>
+        </div>
+        <div class="carbon-point">
+          <div class="cp-icon">📈</div>
+          <div>
+            <div class="cp-title">A future revenue stream: carbon credits</div>
+            <div class="cp-text">Voluntary carbon markets pay for verified sequestration. The long-term vision is for Liventory's carbon ledger to be the foundation for tree growers to participate in those markets — a revenue stream the industry has never had access to.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KNOWLEDGE -->
+<section id="knowledge">
+  <div class="section-wrap">
+    <div class="reveal">
+      <div class="eyebrow">Plant Intelligence</div>
+      <h2 class="section-h2">A living encyclopedia<br>no one else <em>has.</em></h2>
+      <p class="section-lead">Liventory is being designed to aggregate the world's best open plant data and make it actionable — guidance tuned to your zone, your weather, and your inventory.</p>
+    </div>
+    <div class="knowledge-grid reveal-stagger">
+      <div class="know-card">
+        <div class="know-num">300K+</div>
+        <div class="know-title">Species in the Graph</div>
+        <div class="know-text">USDA PLANTS DB, RHS Plant Finder, iNaturalist, and GBIF — the data sources being integrated to power plant guidance across every module.</div>
+      </div>
+      <div class="know-card">
+        <div class="know-num">Free</div>
+        <div class="know-title">Live Weather, Every Zone</div>
+        <div class="know-text">Open-Meteo provides WMO-standard weather data at zero cost — one of the data sources already connected and pulling live data.</div>
+      </div>
+      <div class="know-card">
+        <div class="know-num">AI</div>
+        <div class="know-title">Photo Disease Diagnosis</div>
+        <div class="know-text">PlantNet API is planned to enable photo-based disease diagnosis with treatment recommendations — in the field, no desk required.</div>
+      </div>
+      <div class="know-card">
+        <div class="know-num">+</div>
+        <div class="know-title">Network Effect</div>
+        <div class="know-text">As more nurseries join, the pest prediction model and carbon data improve. The platform is designed to get smarter with every grower.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- TIME SAVED -->
+<section id="time">
+  <div class="time-inner">
+    <div class="reveal">
+      <div class="eyebrow">Time Reclaimed</div>
+      <h2 class="section-h2">Stop doing paperwork.<br>Start <em>growing.</em></h2>
+      <p class="section-lead">Most growers got into this business because they love working with plants — not because they love updating spreadsheets at 9pm. Inventory gets checked multiple times a week, aging reports pile up, grant deadlines pass unnoticed. Liventory is designed to give that time back.</p>
+    </div>
+    <div class="reveal" style="margin-bottom:40px;padding:28px 36px;background:rgba(109,191,130,.06);border:1px solid rgba(109,191,130,.18);border-left:3px solid var(--leaf)">
+      <div style="font-family:var(--fu);font-size:10px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--leaf);margin-bottom:12px">What the day looks like right now</div>
+      <p style="font-family:var(--fd);font-size:22px;font-style:italic;color:var(--white);line-height:1.4;margin-bottom:0">"Inventory alone gets touched 3–4 times a week. Add aging analysis, weather checks, and scrambling for grants — and you're losing a full workday every week to tasks that should just happen automatically."</p>
+    </div>
+    <div class="reveal">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Manual / Spreadsheet</th>
+            <th>Liventory (Projected)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="td-task">Inventory update <span style="font-family:var(--fu);font-size:9px;letter-spacing:.1em;color:var(--sage);display:block;margin-top:3px">happens 3–4× per week</span></td><td class="td-manual">25 min</td><td class="td-agent">2 min</td></tr>
+          <tr><td class="td-task">Aging analysis</td><td class="td-manual">40 min</td><td class="td-agent">Auto</td></tr>
+          <tr><td class="td-task">Carbon tracking</td><td class="td-manual">90 min</td><td class="td-agent">Auto</td></tr>
+          <tr><td class="td-task">Grant discovery</td><td class="td-manual">Never</td><td class="td-agent">Continuous</td></tr>
+          <tr><td class="td-task">Report generation</td><td class="td-manual">60 min</td><td class="td-agent">5 min</td></tr>
+          <tr><td class="td-task">Weather check (all zones)</td><td class="td-manual">15 min</td><td class="td-agent">Auto</td></tr>
+        </tbody>
+      </table>
+      <p style="font-family:var(--fu);font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--leaf);margin-top:28px;text-align:center">Designed to give back 4–6+ hours every week —<br>to spend in the field, not in front of a screen.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- PILOT / CONTACT -->
+<section id="pilot">
+  <div class="pilot-inner">
+    <div class="reveal">
+      <div class="eyebrow">Early Access</div>
+      <h2 class="section-h2">Building this<br><em>with the right people.</em></h2>
+      <p class="section-lead">Liventory is early-stage and in active development. We're looking for nursery partners, engineers, and advisors who want to help shape it from the ground up — and for the right programs to accelerate it.</p>
+      <div class="pilot-cards">
+        <div class="pilot-card featured">
+          <div class="pc-icon">🌱</div>
+          <div>
+            <div class="pc-title">Pilot Nursery Partner</div>
+            <div class="pc-text">We're looking for nursery operations to pilot the platform on real data. Free setup, direct influence on the product roadmap, and founding-partner pricing locked in.</div>
+          </div>
+        </div>
+        <div class="pilot-card">
+          <div class="pc-icon">⚡</div>
+          <div>
+            <div class="pc-title">Engineering Collaborator</div>
+            <div class="pc-text">React / Node.js, React Native, or AI/ML. Early-stage equity conversation open. We are looking for co-builders who care about this space.</div>
+          </div>
+        </div>
+        <div class="pilot-card">
+          <div class="pc-icon">📈</div>
+          <div>
+            <div class="pc-title">Investor and Advisor</div>
+            <div class="pc-text">SaaS, agri-tech, vertical software, or carbon markets background. Pre-revenue, early stage. Industry introductions are equally valuable.</div>
+          </div>
+        </div>
+      </div>
+      <div class="wanczyk-note" style="border-left-color:var(--amber);margin-top:16px;margin-bottom:16px">
+        <div class="wanczyk-label" style="color:var(--amber)">Hyperagent Founding 500</div>
+        <div class="wanczyk-text">Liventory is applying to Howie Liu's Founding 500 — a $10M program offering $20K in inference credits to 500 agent-first founders. A perfect match for a platform built entirely around autonomous agents operating on real nursery data. Deadline: May 31, 2026.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">
+    <img src="data:image/jpeg;base64,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" alt="Liventory" width="28" height="28" style="border-radius:6px;display:block;flex-shrink:0">
+    <span>LIVENTORY</span>
+  </div>
+  <ul class="foot-links">
+    <li><a href="#agents">Agents</a></li>
+    <li><a href="#carbon">Carbon</a></li>
+    
+    <li><a href="#pilot">Early Access</a></li>
+  </ul>
+  <div class="foot-copy">2026 Liventory</div>
+</footer>
+
+<script>
+// Custom cursor
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+(function anim() {
+  rx += (mx - rx) * 0.14; ry += (my - ry) * 0.14;
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(anim);
+})();
+document.querySelectorAll('a, button, input, select, textarea, .agent-card, .pilot-card, .stat-cell, .know-card, .carbon-point').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.style.width='20px'; cursor.style.height='20px'; ring.style.width='56px'; ring.style.height='56px'; });
+  el.addEventListener('mouseleave', () => { cursor.style.width='10px'; cursor.style.height='10px'; ring.style.width='36px'; ring.style.height='36px'; });
+});
+
+// Scroll reveal
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => obs.observe(el));
+
+// Scrollspy — highlight active nav link as sections come into view
+const sections = ['agents','carbon','knowledge','time','pilot'];
+const navLinks = document.querySelectorAll('.nav-links a[data-section]');
+const spyObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.remove('active'));
+      const active = document.querySelector(`.nav-links a[data-section="${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+sections.forEach(id => { const el = document.getElementById(id); if (el) spyObs.observe(el); });
+
+// Smooth scroll for all anchor links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // close mobile menu if open
+      document.getElementById('mobileMenu').classList.remove('open');
+    }
+  });
+});
+
+// Burger menu toggle
+const burger = document.getElementById('burger');
+const mobileMenu = document.getElementById('mobileMenu');
+burger.addEventListener('click', () => {
+  mobileMenu.classList.toggle('open');
+});
+
+// Form — async Formspree submit
+const form = document.querySelector('.contact-form');
+if (form) {
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const note = document.getElementById('form-note');
+    const btn = form.querySelector('.form-submit');
+    btn.textContent = 'Sending...';
+    btn.style.opacity = '0.6';
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        btn.textContent = 'Message sent!';
+        btn.style.opacity = '1';
+        note.textContent = "Got it — we'll be in touch within 48 hours.";
+        note.style.color = '#6dbf82';
+        note.style.fontWeight = '500';
+        form.querySelectorAll('input, select, textarea').forEach(f => f.value = '');
+      } else { throw new Error(); }
+    } catch {
+      btn.textContent = 'Send Message';
+      btn.style.opacity = '1';
+      note.textContent = 'Something went wrong. Try refreshing and submitting again.';
+      note.style.color = '#e07050';
+    }
+  });
+}
+</script>
+</body>
+</html>
